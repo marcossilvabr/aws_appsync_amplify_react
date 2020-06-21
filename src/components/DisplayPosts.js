@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { listPosts } from '../graphql/queries';
-import { onCreatePost, onDeletePost } from '../graphql/subscriptions';
+import { onCreatePost, onDeletePost, onUpdatePost } from '../graphql/subscriptions';
 import { API, graphqlOperation } from 'aws-amplify';
 import DeletePost from './DeletePost';
 import EditPost from './EditPost';
@@ -37,9 +37,20 @@ const DisplayPosts = () => {
             setPosts(updatedPosts);
           }
         })
+    const updatePostListener =
+      API.graphql(graphqlOperation(onUpdatePost))
+        .subscribe({
+          next: postData => {
+            const updatedPost = postData.value.data.onUpdatePost;
+            const updatedPostIndex = posts.findIndex(post => post.id === updatedPost.id);
+            const updatedPosts = [...posts.slice(0, updatedPostIndex), updatedPost, ...posts.slice(updatedPostIndex + 1)];
+            setPosts(updatedPosts);
+          }
+        })
     return () => {
       createPostListener.unsubscribe();
       deletePostListener.unsubscribe();
+      updatePostListener.unsubscribe();
     }
   }, [posts]);
 
@@ -61,7 +72,7 @@ const DisplayPosts = () => {
           <br />
           <span>
             <DeletePost post={post} />
-            <EditPost />
+            <EditPost post={post} />
           </span>
         </div>
       ))}
