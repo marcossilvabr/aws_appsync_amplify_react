@@ -4,6 +4,7 @@ import { onCreatePost, onDeletePost, onUpdatePost } from '../graphql/subscriptio
 import { API, graphqlOperation } from 'aws-amplify';
 import DeletePost from './DeletePost';
 import EditPost from './EditPost';
+import CreateCommentPost from './CreateCommentPost';
 
 const DisplayPosts = () => {
   const [posts, setPosts] = useState([]);
@@ -70,9 +71,13 @@ const DisplayPosts = () => {
           <p>{post.postBody}</p>
 
           <br />
+
           <span>
             <DeletePost post={post} />
             <EditPost post={post} />
+          </span>
+          <span>
+            <CreateCommentPost post={post} />
           </span>
         </div>
       ))}
